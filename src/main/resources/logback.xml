@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+	
+	<property resource="application.properties"/>
+    <property name="log.path" value="log"/>
+    <property name="log.filename.prefix" value="appLog"/>
+    
+    <!-- logs folder created in user.dir folder, 
+         value is printed by calling System.getProperty("user.dir")
+    	 if you want see this property for a running jvm process, then do the following
+    	  - execute command "jps -lm" and identify the pid of the server process
+    	  - execute command "jcmd <SERVER PROCESS PID> VM.system_properties" to see the properties
+    -->
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} || [%thread] || %-5level || %logger{36} || %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+    
+    <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/${log.filename.prefix}.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/archive/year_%d{yyyy, aux}/month_%d{MM, aux}/${log.filename.prefix}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <!-- each archived file, size max 10MB -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- total size of all archive files, if total size > 100GB, it will delete old archived file -->
+            <totalSizeCap>100GB</totalSizeCap>
+            <!-- 3653 days (10 years) to keep -->
+            <maxHistory>3653</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d || [%t] || %p || %c{1.} || %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <if condition='p("spring.profiles.active").contains("prod")'>
+    	<then>
+		    <root level="WARN">
+				<appender-ref ref="CONSOLE" />
+				<appender-ref ref="FILE-ROLLING" />
+			</root>
+		</then>
+	</if>
+	
+	<if condition='p("spring.profiles.active").contains("local") || p("spring.profiles.active").contains("dev")'>
+    	<then>
+		    <root level="DEBUG">
+				<appender-ref ref="CONSOLE" />
+				<appender-ref ref="FILE-ROLLING" />
+			</root>
+		</then>
+	</if>
+	
+	<if condition='!p("spring.profiles.active").contains("local") &amp;&amp; !p("spring.profiles.active").contains("dev") &amp;&amp; !p("spring.profiles.active").contains("prod")'>
+    	<then>
+		    <root level="DEBUG">
+				<appender-ref ref="CONSOLE" />
+				<appender-ref ref="FILE-ROLLING" />
+			</root>
+		</then>
+	</if>
+
+</configuration>
