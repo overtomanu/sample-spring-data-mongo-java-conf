@@ -46,7 +46,6 @@
 			<artifactId>spring-security-taglibs</artifactId>
 		</dependency>
 		
-		<!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-mongodb -->
 		<dependency>
 		    <groupId>org.springframework.data</groupId>
 		    <artifactId>spring-data-mongodb</artifactId>
@@ -275,7 +274,7 @@
 	</dependencies>
 
 	<dependencyManagement>
-		<!-- https://mvnrepository.com/artifact/org.junit/junit-bom -->
+
 		<dependencies>
 			<dependency>
 				<groupId>org.junit</groupId>
@@ -286,7 +285,7 @@
 			</dependency>
 			<!-- ideally should use org.springframework.boot:spring-boot-dependencies 
 				bom but using the simpler spring-framework-bom for now -->
-			<!-- https://mvnrepository.com/artifact/org.springframework/spring-framework-bom -->
+				
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-framework-bom</artifactId>
@@ -294,7 +293,7 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			<!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-bom -->
+
 			<dependency>
 				<groupId>org.springframework.data</groupId>
 				<artifactId>spring-data-bom</artifactId>

@@ -15,12 +15,6 @@ import lombok.Builder;
 @Document
 public class Customer extends Auditable<String> {
 
-	/*
-	Extending org.springframework.data.jpa.domain.AbstractAuditable gives error
-	"Specified key was too long" if we use string as id column with hibernate JPA on mysql db
-	So creating our own mappedSuperClass for auditing and defining Id column in subclass
-	*/
-
 	@Id
 	private String id;
 
