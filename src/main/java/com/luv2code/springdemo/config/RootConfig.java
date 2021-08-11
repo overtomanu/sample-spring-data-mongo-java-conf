@@ -1,5 +1,7 @@
 package com.luv2code.springdemo.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -7,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -54,26 +57,44 @@ public class RootConfig extends WebSecurityConfigurerAdapter {
 
 	}
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
 
-		http.authorizeRequests()
-			.antMatchers("/customer/showForm*").hasAnyRole("MANAGER", "ADMIN")
-			.antMatchers("/customer/save*").hasAnyRole("MANAGER", "ADMIN")
-			.antMatchers("/customer/delete").hasRole("ADMIN")
-			.antMatchers("/customer/**").hasRole("EMPLOYEE")
-			.antMatchers("/resources/**").permitAll()
-			.antMatchers("/webjars/**").permitAll()
-			.and()
-			.formLogin()
-				.loginPage("/showMyLoginPage")
-				.loginProcessingUrl("/authenticateTheUser")
-				.permitAll()
-			.and()
-			.logout().permitAll()
-			.and()
-			.exceptionHandling().accessDeniedPage("/access-denied");
-		
+	@Configuration
+	@Order(3)
+	public static class ApiWebSecurityConfigurationAdapter
+			extends WebSecurityConfigurerAdapter {
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			http.antMatcher("/api/**").authorizeRequests(
+					authorize -> authorize.anyRequest().hasRole("ADMIN"))
+					.httpBasic(withDefaults()).csrf().disable();
+		}
+	}
+
+	@Order(4)
+	@Configuration
+	public static class FormLoginWebSecurityConfigurerAdapter
+			extends WebSecurityConfigurerAdapter {
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			//@formatter:off
+			http.authorizeRequests()
+				.antMatchers("/customer/showForm*").hasAnyRole("MANAGER", "ADMIN")
+				.antMatchers("/customer/save*").hasAnyRole("MANAGER", "ADMIN")
+				.antMatchers("/customer/delete").hasRole("ADMIN")
+				.antMatchers("/customer/**").hasRole("EMPLOYEE")
+				.antMatchers("/resources/**").permitAll()
+				.antMatchers("/webjars/**").permitAll()
+				.and()
+				.formLogin()
+					.loginPage("/showMyLoginPage")
+					.loginProcessingUrl("/authenticateTheUser")
+					.permitAll()
+				.and()
+				.logout().permitAll()
+				.and()
+				.exceptionHandling().accessDeniedPage("/access-denied");
+			//@formatter:off
+		}
 	}
 	
 	@Bean
